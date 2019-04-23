@@ -32,6 +32,7 @@ Q_SIGNALS:
 public slots:
     void generateData(int type, int rowCount, int colCount);
     void update(QAbstractSeries *series);
+    void readData();
 
 private:
     QQuickView *m_appViewer;

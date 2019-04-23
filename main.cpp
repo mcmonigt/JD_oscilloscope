@@ -16,6 +16,10 @@
 #include <QtQuick/QQuickView>
 #include <QtQml/QQmlEngine>
 #include <QtCore/QDir>
+#include <QFile>
+#include <QString>
+#include <QTextStream>
+#include <QDebug>
 #include "datasource.h"
 
 int main(int argc, char *argv[])

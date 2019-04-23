@@ -37,9 +37,10 @@ ColumnLayout {
     Layout.fillHeight: true
     signal animationsEnabled(bool enabled)
     signal seriesTypeChanged(string type)
-    signal refreshRateChanged(variant rate);
-    signal signalSourceChanged(string source, int signalCount, int sampleCount);
-    signal signalVoltageScaleChanged(int lowerBoundX, int upperBoundX);
+    signal refreshRateChanged(variant rate)
+    signal signalSourceChanged(string source, int signalCount, int sampleCount)
+    signal voltageScaleChanged1(int newBoundary)
+    signal voltageScaleChanged2(int newBoundary)
     signal antialiasingEnabled(bool enabled)
     signal openGlChanged(bool enabled)
 
@@ -106,12 +107,23 @@ ColumnLayout {
     }
 
     MultiButton {
-        id: voltageScaleButton
-        text: "Voltage Scale PP: "
+        id: voltageScaleButton1
+        text: "Voltage Signal 1: "
         items: ["5", "10", "1"]
         currentSelection: 0
-        onSelectionChanged: signalVoltageScaleChanged(
-                                voltageScaleButton.items[voltageScaleButton.currentSelection],
+        onSelectionChanged: voltageScaleChanged1(
+                                voltageScaleButton1.items[voltageScaleButton1.currentSelection],
+                                5,
+                                selection);
+    }
+
+    MultiButton {
+        id: voltageScaleButton2
+        text: "Voltage Signal 2: "
+        items: ["5", "10", "1"]
+        currentSelection: 0
+        onSelectionChanged: voltageScaleChanged2(
+                                voltageScaleButton2.items[voltageScaleButton2.currentSelection],
                                 5,
                                 selection);
     }

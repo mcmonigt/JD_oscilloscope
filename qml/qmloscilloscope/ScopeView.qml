@@ -146,9 +146,13 @@ ChartView {
 //        axisY1.min = 10;
         refreshTimer.interval = 1 / Number(rate) * 1000;
     }
-    function changeVoltageScale(BoundX) {
-        axisY1.min = BoundX;
-        axisY2.max = -BoundX;
+    function changeVoltageScale1(newBoundary) {
+        axisY1.min = -newBoundary;
+        axisY1.max = newBoundary;
+    }
+    function changeVoltageScale2(newBoundary){
+        axisY2.min = -newBoundary;
+        axisY2.max = newBoundary;
     }
 
     function signal1Visible(enabled){

@@ -17,6 +17,12 @@
 #include <QtCore/QDebug>
 #include <QtCore/QRandomGenerator>
 #include <QtCore/QtMath>
+#include <QFile>
+#include <QString>
+#include <QTextStream>
+#include <QDebug>
+#include <iostream>
+//#include <fstream>
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -31,7 +37,8 @@ DataSource::DataSource(QQuickView *appViewer, QObject *parent) :
     qRegisterMetaType<QAbstractSeries*>();
     qRegisterMetaType<QAbstractAxis*>();
 
-     generateData(0, 5, 1024);
+//    generateData(0, 5, 1024);
+    readData();
 }
 
 void DataSource::update(QAbstractSeries *series)
@@ -62,7 +69,7 @@ void DataSource::generateData(int type, int rowCount, int colCount)
             qreal y(0);
             switch (type) {
             case 0:
-                // data with sin + random component
+                // data with sin + random component in the range [0, 1)
                 y = qSin(M_PI / 50 * j) + 0.5 + QRandomGenerator::global()->generateDouble();
                 x = j;
                 break;
@@ -79,4 +86,58 @@ void DataSource::generateData(int type, int rowCount, int colCount)
         }
         m_data.append(points);
     }
+}
+
+void DataSource::readData()
+{
+    // clear previous data
+    m_data.clear();
+
+    // append new data
+
+    QFile inputFile(QString("/home/tomas/Documents/spring2019/ece342/Oscilloscope/Code/data_signal1.txt"));
+    if (inputFile.open(QIODevice::ReadOnly | QIODevice::Text)){
+        qDebug() << " file opened";
+        QTextStream in(&inputFile);
+        qreal x(0);
+        qreal y(0);
+        QVector<QPointF> points;
+        points.reserve(1024);
+        while(!in.atEnd()){
+            in >> x >> y;
+
+            std::cout << "x: " << x << " y: " << y << std::endl;
+            if (x != 0 && y != 0){
+                points.append(QPointF(x, y));
+            }
+//            points.append(QPointF(x, y));
+
+
+        }
+        m_data.append(points);
+        inputFile.close();
+    }
+    else {
+        qDebug() << " Could not open file for writing";
+    }
+
+
+//    QFile inputFile(QString("home/tomas/Documents/spring2019/ece342/data_signal1"));
+//    if (inputFile.open(QIODevice::ReadOnly | QIODevice::Text)){
+//        QTextStream in(&inputFile);
+//        qreal x(0);
+//        qreal y(0);
+//        QVector<QPointF> points;
+//        points.reserve(1024);
+//        while(!in.atEnd()){
+//            in >> x >> y;
+//            points.append(QPointF(x, y));
+//        }
+//        m_data.append(points);
+//        inputFile.close();
+//    }
+//    else {
+//        qDebug() << " Could not open file for writing";
+//    }
+
 }

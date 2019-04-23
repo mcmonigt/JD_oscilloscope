@@ -51,16 +51,14 @@ Item {
                 dataSource.generateData(1, signalCount, sampleCount);
             scopeView.axisX().max = sampleCount;
         }
-//        onVoltageScaleChanged: {
-//            axisY1.min = voltageScale;
-//        }
 
         onSeriesTypeChanged: scopeView.changeSeriesType(type);
         onRefreshRateChanged: {
             scopeView.changeRefreshRate(rate);
 //            scopeView.changeVoltageScale(rate);
          }
-//        onVoltageScaleChanged: scopeView.changeVoltaegeScale(rate);
+        onVoltageScaleChanged1: scopeView.changeVoltageScale1(newBoundary);
+        onVoltageScaleChanged2: scopeView.changeVoltageScale2(newBoundary);
         // onAntialiasingEnabled name needs to be changed to onSingal1Enabled
         onAntialiasingEnabled: scopeView.signal1Visible(enabled);
             //scopeView.antialiasing = enabled;
