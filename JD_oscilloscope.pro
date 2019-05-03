@@ -1,4 +1,4 @@
-QT += charts qml quick
+QT += charts qml quick serialport core
 
 HEADERS += \
     datasource.h

@@ -45,17 +45,20 @@ Item {
 //![1]
 
         onSignalSourceChanged: {
-            if (source == "AC")
-                dataSource.generateData(0, signalCount, sampleCount);
-            else
-                dataSource.generateData(1, signalCount, sampleCount);
+
+
+//            console.log("onSignalSourceChanged signal entered");
+//            if (source == "AC")
+//                dataSource.generateData(0, signalCount, sampleCount);
+//            else
+//                dataSource.generateData(1, signalCount, sampleCount);
             scopeView.axisX().max = sampleCount;
         }
 
         onSeriesTypeChanged: scopeView.changeSeriesType(type);
         onRefreshRateChanged: {
             scopeView.changeRefreshRate(rate);
-//            scopeView.changeVoltageScale(rate);
+            scopeView.changeVoltageScale(rate);
          }
         onVoltageScaleChanged1: scopeView.changeVoltageScale1(newBoundary);
         onVoltageScaleChanged2: scopeView.changeVoltageScale2(newBoundary);
@@ -67,6 +70,10 @@ Item {
             scopeView.signal2Visible(enabled);
             //scopeView.openGL = enabled;
         }
+        onTimeAxisChanged:
+            scopeView.axisX().max = sampleCount;
+
+//            scopeView.xAxisChanged(xAxisRange);
     }
 
 //![2]

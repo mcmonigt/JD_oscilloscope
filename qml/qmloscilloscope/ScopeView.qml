@@ -37,6 +37,7 @@ ChartView {
     theme: ChartView.ChartThemeDark
     property bool openGL: true
     property bool openGLSupported: true
+    property int xAxisScaleValue: 1000
     onOpenGLChanged: {
         if (openGLSupported) {
             series("signal 1").useOpenGL = openGL;
@@ -65,7 +66,13 @@ ChartView {
     ValueAxis {
         id: axisX
         min: 0
-        max: 1024
+        max: 10000
+    }
+
+    ValueAxis {
+        id: dummy
+        min: 0
+        max: 10000
     }
 
     LineSeries {
@@ -91,8 +98,10 @@ ChartView {
         running: true
         repeat: true
         onTriggered: {
-            dataSource.update(chartView.series(0));
-            dataSource.update(chartView.series(1));
+//            console.log("timer triggered");
+            dataSource.update(chartView.series(0), 1);
+            dataSource.update(chartView.series(1), 2);
+//            updateTimeAxis();
         }
     }
     //![2]
@@ -168,4 +177,13 @@ ChartView {
         else
             series("signal 2").visible = true;
    }
+    function xAxisChanged(xAxisRange){
+
+        dummy.max = xAxisRange;
+
+    }
+    function updateTimeAxis(){
+        axisX.max = dataSource.timeElapsed();
+//        axisX.min = dataSource.timeElapsed() - dummy.max;
+    }
 }

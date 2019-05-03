@@ -13,11 +13,18 @@ double doubleRand() {
 }
 
 int main(){
+  ofstream voltage_scale;
+  // voltage_scale.open("voltage_scale.txt", ios::out | ios::trunc);
+  // if (voltage_scale.fail()){
+  //   cout << "could not open file voltage_scale" << endl;
+  //   return 1;
+  // }
+  // ofstream << "5" << 
   srand(static_cast<unsigned int>(clock()));
-  ofstream myfile;
+  ofstream data_signal1;
   while (1){
-    myfile.open("data_signal1.txt", ios::out | ios::trunc);
-    if (myfile.fail()){
+    data_signal1.open("data_signal1.txt", ios::out | ios::trunc);
+    if (data_signal1.fail()){
       cout << "could not open file data_signal1" << endl;
       return 1;
     }
@@ -25,10 +32,12 @@ int main(){
       double y = sin(PI / 50 * j) + 0.5 + doubleRand();
       double x = j;
       if (x != 0 && y !=0){
-        myfile << x << " " << y << '\n';
+        data_signal1 << x << " " << y << '\n';
       }
     }
-    myfile.close();
+    data_signal1.close();
+
+
     sleep(1);
   }
   return 0;

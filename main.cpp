@@ -20,6 +20,8 @@
 #include <QString>
 #include <QTextStream>
 #include <QDebug>
+#include <QSerialPort>
+#include <QSerialPortInfo>
 #include "datasource.h"
 
 int main(int argc, char *argv[])
@@ -53,10 +55,13 @@ int main(int argc, char *argv[])
     // Sets the tittle for the graph
     viewer.setTitle(QStringLiteral("JD Oscilloscope"));
 
+    // Creates the object for serial communications
+    QSerialPort serial;
+
     // Creates an object of class DataSource which is created and defined in datasource.h and datasource.cpp
     // the object viewer of class QQuickView is passed as an argument to the constructor of DataSource which
     // links it to the QQuickView private member of the DataSource class for later use
-    DataSource dataSource(&viewer);
+    DataSource dataSource(&viewer, &serial);
 
     // The following line accesses the QQmlContext class member, contexts allow data to be exposed to the QML components instantiated by the QML engine.
     // Each QQmlContext contains a set of properties, distinct from its QObject properties, that allow data to be explicitly bound to a context by name.
@@ -74,6 +79,21 @@ int main(int argc, char *argv[])
 
     // Allows the window to be displayed
     viewer.show();
+
+//    QObject::connect(&serial, &QSerialPort::readyRead, [&]
+//    {
+
+//        dataSource.readData();
+//    });
+    QObject::connect(&serial,
+                         static_cast<void(QSerialPort::*)(QSerialPort::SerialPortError)>
+                         (&QSerialPort::error),
+                         [&](QSerialPort::SerialPortError error)
+    {
+        //this is called when a serial communication error occurs
+        qDebug() << "An error occured: " << error;
+        return qApp->quit();
+    });
 
     // Executes the app
     return app.exec();
