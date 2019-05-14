@@ -44,15 +44,10 @@ Item {
         anchors.leftMargin: 10
 //![1]
 
-        onSignalSourceChanged: {
-
-
-//            console.log("onSignalSourceChanged signal entered");
-//            if (source == "AC")
-//                dataSource.generateData(0, signalCount, sampleCount);
-//            else
-//                dataSource.generateData(1, signalCount, sampleCount);
-            scopeView.axisX().max = sampleCount;
+        onSignalTimeScaleChanged: {
+            dataSource.changeTimeScale(sampleCount);
+            scopeView.axisX().max = sampleCount/2;
+            scopeView.axisX().min = -sampleCount/2;
         }
 
         onSeriesTypeChanged: scopeView.changeSeriesType(type);

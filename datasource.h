@@ -42,9 +42,11 @@ Q_SIGNALS:
 public slots:
     void generateData(int type, int rowCount, int colCount);
     void update(QAbstractSeries *series, int series_num);
-    void readData();
-    void plotData(int type, int value);
+    void readData(QAbstractSeries *series);
     int timeElapsed();
+    void setupSerial(QSerialPort *serial);
+    void changeTimeScale(int time_scale);
+    void testData();
 
 private:
     // Serial members
@@ -60,6 +62,11 @@ private:
 //    QXYSeries *series1;
 //    QXYSeries *series2;
     int m_index;
+
+    // data structure members
+    QVector<QPointF> s1;
+    QVector<QPointF> s2;
+    int timeScale;
 };
 
 #endif // DATASOURCE_H

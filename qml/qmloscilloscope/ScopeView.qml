@@ -55,6 +55,7 @@ ChartView {
         id: axisY1
         min: -1
         max: 4
+
     }
 
     ValueAxis {
@@ -65,15 +66,17 @@ ChartView {
 
     ValueAxis {
         id: axisX
-        min: 0
-        max: 10000
+        min: -500
+        max: 500
+//        labelsVisible: false
     }
 
-    ValueAxis {
-        id: dummy
-        min: 0
-        max: 10000
-    }
+//    ValueAxis {
+//        id: timeScale
+//        min: 0
+//        max: 10000
+//        labelsVisible: true
+//    }
 
     LineSeries {
         id: lineSeries1

@@ -38,7 +38,7 @@ ColumnLayout {
     signal animationsEnabled(bool enabled)
     signal seriesTypeChanged(string type)
     signal refreshRateChanged(variant rate)
-    signal signalSourceChanged(string source, int signalCount, int sampleCount)
+    signal signalTimeScaleChanged(int sampleCount)
     signal voltageScaleChanged1(int newBoundary)
     signal voltageScaleChanged2(int newBoundary)
     signal antialiasingEnabled(bool enabled)
@@ -79,28 +79,14 @@ ColumnLayout {
     }
 
     MultiButton {
-        id: signalSourceButton
-        text: "Source: "
-        items: ["AC", "DC"]
-        currentSelection: 0
-        onSelectionChanged: signalSourceChanged(
-                                selection,
-                                5,
-                                sampleCountButton.items[sampleCountButton.currentSelection]);
-    }
-
-    MultiButton {
         id: sampleCountButton
         text: "Time Elapsed (ms): "
 //        items: ["6", "128", "1024", "10000"]
-        items: ["10000", "1000", "100", "10", "5"]
+        items: ["10000", "1000", "100", "10"]
         currentSelection: 0
         // onSelectionChanged: timeAxisChanged(items[currentSelection]);
 
-        onSelectionChanged: signalSourceChanged(
-                                signalSourceButton.items[signalSourceButton.currentSelection],
-                                5,
-                                selection);
+        onSelectionChanged: signalTimeScaleChanged(selection);
     }
 
     MultiButton {
