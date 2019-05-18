@@ -25,6 +25,8 @@
 #include <QIODevice>
 #include <stdio.h>
 #include <string.h>
+#include <ftd2xx.h>
+#include <unistd.h>
 #define MAX_DATA 10000
 #define VCC 3.3
 
@@ -57,6 +59,9 @@ DataSource::DataSource(QQuickView *appViewer, QSerialPort *serial, QObject *pare
 
     // initializes serial port
     // setupSerial(serial);
+
+    //tests fifo
+    readData_fifo();
 
 
 //    generateData(0, 5, 1024);
@@ -298,5 +303,108 @@ void DataSource::readData(QAbstractSeries* series){
 //    xySeries->append(t.elapsed(), 1);
 
 
+}
+
+int DataSource::readData_fifo(){
+    FT_HANDLE fthandle1;  //handle to access device
+    FT_STATUS status;	//device status
+
+    //0 is index of device since we're only opening 1 device
+    status = FT_Open(0, &fthandle1);
+
+    if (status != FT_OK) {	//if device is not opened succesfully
+        qDebug() << "open device status not ok " << status;
+//        printf("open device status is not ok %d\n", status);
+        return 0;
+    }
+
+    //set read and write timeouts as 500ms
+    status = FT_SetTimeouts(fthandle1, 500, 500);
+
+    if (status != FT_OK) {	//if timeout are not setup succesfully
+        printf("timeout device status not Ok %d\n", status);
+    }
+
+    UCHAR MaskA = 0x00; // set data bus to inputs
+    UCHAR modeA = 0x40; //configure ft232h into synch fifo mode
+                        //fifo mode must already have been programmed in eeprom
+                        //fifo mode must already have been programmed in eeprom
+
+    //set the chip mode
+    status = FT_SetBitMode(fthandle1, MaskA, modeA);
+
+    if (status != FT_OK)//if mode seelect was not succesfull
+        printf("mode A status not ok %d\n", status);
+
+    usleep(1); //stop program fpr 500 uSec
+
+    int count = 0;
+
+    while(1){
+
+        DWORD RxBytes;	//bytes in rx  qeue
+        DWORD TxBytes;	//bytes in tx queue
+        DWORD EventDword;	//current event status state
+
+        //get the values of rx,tx queue and event status
+        status = FT_GetStatus(fthandle1, &RxBytes, &TxBytes, &EventDword);
+
+
+        printf("bytes in RX queue %d\n", RxBytes);
+
+        printf("\n");
+
+
+        UCHAR data_in[65536]; //buffer for incoming data
+        DWORD r_data_len = RxBytes;		//bytes to be read from device
+        DWORD data_read;		//num bytes read from device
+        memset(data_in, 0, 1028);	//sets values in data_in to 0
+
+
+
+
+        //read r_data_len number of bytes from device into data_in buffer
+        status = FT_Read(fthandle1, data_in, r_data_len, &data_read);
+
+        if (status != FT_OK) {
+            printf("status not OK %d\n", status);
+
+            printf("total bytes read %d\n", count);
+            return 0;
+        }
+        else {
+
+
+            printf("bytes read %d\n", data_read);
+            printf("data read %c\n", (char)data_in[0]);
+            printf("data read %c\n", (char)data_in[1]);
+            printf("data read %c\n", (char)data_in[2]);
+            printf("data read %c\n", (char)data_in[3]);
+            printf("data read %c\n", (char)data_in[4]);
+            printf("data read %c\n", (char)data_in[5]);
+            printf("data read %c\n", (char)data_in[6]);
+            printf("data read %c\n", (char)data_in[7]);
+            printf("data read %c\n", (char)data_in[8]);
+            printf("data read %c\n", (char)data_in[9]);
+            printf("data read %c\n", (char)data_in[10]);
+            printf("data read %c\n", (char)data_in[11]);
+            printf("data read %c\n", (char)data_in[12]);
+            printf("data read %c\n", (char)data_in[13]);
+            printf("data read %c\n", (char)data_in[14]);
+            printf("data read %c\n", (char)data_in[15]);
+        }
+
+        count = count + data_read;
+
+    }
+
+
+    getchar(); //getchar from stdin
+
+    //close device
+    status = FT_Close(fthandle1);
+
+
+    return 0;
 }
 

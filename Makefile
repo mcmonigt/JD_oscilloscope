@@ -17,7 +17,7 @@ CXX           = g++
 DEFINES       = -DQT_QML_DEBUG -DQT_CHARTS_LIB -DQT_WIDGETS_LIB -DQT_QUICK_LIB -DQT_GUI_LIB -DQT_QML_LIB -DQT_NETWORK_LIB -DQT_SERIALPORT_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I. -I../../Qt/5.12.3/gcc_64/include -I../../Qt/5.12.3/gcc_64/include/QtCharts -I../../Qt/5.12.3/gcc_64/include/QtWidgets -I../../Qt/5.12.3/gcc_64/include/QtQuick -I../../Qt/5.12.3/gcc_64/include/QtGui -I../../Qt/5.12.3/gcc_64/include/QtQml -I../../Qt/5.12.3/gcc_64/include/QtNetwork -I../../Qt/5.12.3/gcc_64/include/QtSerialPort -I../../Qt/5.12.3/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I../../Qt/5.12.3/gcc_64/mkspecs/linux-g++
+INCPATH       = -I. -Irelease/build -I../../Qt/5.12.3/gcc_64/include -I../../Qt/5.12.3/gcc_64/include/QtCharts -I../../Qt/5.12.3/gcc_64/include/QtWidgets -I../../Qt/5.12.3/gcc_64/include/QtQuick -I../../Qt/5.12.3/gcc_64/include/QtGui -I../../Qt/5.12.3/gcc_64/include/QtQml -I../../Qt/5.12.3/gcc_64/include/QtNetwork -I../../Qt/5.12.3/gcc_64/include/QtSerialPort -I../../Qt/5.12.3/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I../../Qt/5.12.3/gcc_64/mkspecs/linux-g++
 QMAKE         = /home/mcmonigt/Applications/Qt/5.12.3/gcc_64/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -40,7 +40,7 @@ DISTNAME      = JD_oscilloscope1.0.0
 DISTDIR = /home/mcmonigt/Applications/qt_applications/JD_oscilloscope/.tmp/JD_oscilloscope1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-rpath,/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/lib
-LIBS          = $(SUBLIBS) -L/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/lib -lQt5Charts -lQt5Widgets -lQt5Quick -lQt5Gui -lQt5Qml -lQt5Network -lQt5SerialPort -lQt5Core -lGL -lpthread   
+LIBS          = $(SUBLIBS) -L/home/mcmonigt/Applications/qt_applications/JD_oscilloscope/release/build/ -lftd2xx -L/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/lib -lQt5Charts -lQt5Widgets -lQt5Quick -lQt5Gui -lQt5Qml -lQt5Network -lQt5SerialPort -lQt5Core -lGL -lpthread   
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -253,7 +253,9 @@ DIST          = qml/qmloscilloscope/* \
 		../../Qt/5.12.3/gcc_64/mkspecs/features/exceptions.prf \
 		../../Qt/5.12.3/gcc_64/mkspecs/features/yacc.prf \
 		../../Qt/5.12.3/gcc_64/mkspecs/features/lex.prf \
-		JD_oscilloscope.pro datasource.h main.cpp \
+		JD_oscilloscope.pro WinTypes.h \
+		datasource.h \
+		ftd2xx.h main.cpp \
 		datasource.cpp
 QMAKE_TARGET  = JD_oscilloscope
 DESTDIR       = 
@@ -263,7 +265,7 @@ TARGET        = JD_oscilloscope
 first: all
 ####### Build rules
 
-JD_oscilloscope:  $(OBJECTS)  
+JD_oscilloscope: /home/mcmonigt/Applications/qt_applications/JD_oscilloscope/release/build/libftd2xx.a $(OBJECTS)  
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
 Makefile: JD_oscilloscope.pro ../../Qt/5.12.3/gcc_64/mkspecs/linux-g++/qmake.conf ../../Qt/5.12.3/gcc_64/mkspecs/features/spec_pre.prf \
@@ -689,7 +691,7 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents resources.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents ../../Qt/5.12.3/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents datasource.h $(DISTDIR)/
+	$(COPY_FILE) --parents WinTypes.h datasource.h ftd2xx.h $(DISTDIR)/
 	$(COPY_FILE) --parents main.cpp datasource.cpp $(DISTDIR)/
 
 
@@ -971,7 +973,7 @@ moc_datasource.cpp: datasource.h \
 		../../Qt/5.12.3/gcc_64/include/QtCore/QVector \
 		moc_predefs.h \
 		../../Qt/5.12.3/gcc_64/bin/moc
-	/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/bin/moc $(DEFINES) --include /home/mcmonigt/Applications/qt_applications/JD_oscilloscope/moc_predefs.h -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/mkspecs/linux-g++ -I/home/mcmonigt/Applications/qt_applications/JD_oscilloscope -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/include -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/include/QtCharts -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/include/QtWidgets -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/include/QtQuick -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/include/QtGui -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/include/QtQml -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/include/QtNetwork -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/include/QtSerialPort -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/include/QtCore -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include datasource.h -o moc_datasource.cpp
+	/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/bin/moc $(DEFINES) --include /home/mcmonigt/Applications/qt_applications/JD_oscilloscope/moc_predefs.h -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/mkspecs/linux-g++ -I/home/mcmonigt/Applications/qt_applications/JD_oscilloscope -I/home/mcmonigt/Applications/qt_applications/JD_oscilloscope/release/build -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/include -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/include/QtCharts -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/include/QtWidgets -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/include/QtQuick -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/include/QtGui -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/include/QtQml -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/include/QtNetwork -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/include/QtSerialPort -I/home/mcmonigt/Applications/Qt/5.12.3/gcc_64/include/QtCore -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include datasource.h -o moc_datasource.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -1584,7 +1586,9 @@ datasource.o: datasource.cpp datasource.h \
 		../../Qt/5.12.3/gcc_64/include/QtCore/QRandomGenerator \
 		../../Qt/5.12.3/gcc_64/include/QtCore/QtMath \
 		../../Qt/5.12.3/gcc_64/include/QtCore/QFile \
-		../../Qt/5.12.3/gcc_64/include/QtCore/QString
+		../../Qt/5.12.3/gcc_64/include/QtCore/QString \
+		ftd2xx.h \
+		WinTypes.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o datasource.o datasource.cpp
 
 qrc_resources.o: qrc_resources.cpp 

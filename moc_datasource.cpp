@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_DataSource_t {
-    QByteArrayData data[18];
-    char stringdata0[179];
+    QByteArrayData data[19];
+    char stringdata0[193];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -48,14 +48,16 @@ QT_MOC_LITERAL(13, 123, 12), // "QSerialPort*"
 QT_MOC_LITERAL(14, 136, 6), // "serial"
 QT_MOC_LITERAL(15, 143, 15), // "changeTimeScale"
 QT_MOC_LITERAL(16, 159, 10), // "time_scale"
-QT_MOC_LITERAL(17, 170, 8) // "testData"
+QT_MOC_LITERAL(17, 170, 8), // "testData"
+QT_MOC_LITERAL(18, 179, 13) // "readData_fifo"
 
     },
     "DataSource\0generateData\0\0type\0rowCount\0"
     "colCount\0update\0QAbstractSeries*\0"
     "series\0series_num\0readData\0timeElapsed\0"
     "setupSerial\0QSerialPort*\0serial\0"
-    "changeTimeScale\0time_scale\0testData"
+    "changeTimeScale\0time_scale\0testData\0"
+    "readData_fifo"
 };
 #undef QT_MOC_LITERAL
 
@@ -65,7 +67,7 @@ static const uint qt_meta_data_DataSource[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       7,   14, // methods
+       8,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -73,13 +75,14 @@ static const uint qt_meta_data_DataSource[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    3,   49,    2, 0x0a /* Public */,
-       6,    2,   56,    2, 0x0a /* Public */,
-      10,    1,   61,    2, 0x0a /* Public */,
-      11,    0,   64,    2, 0x0a /* Public */,
-      12,    1,   65,    2, 0x0a /* Public */,
-      15,    1,   68,    2, 0x0a /* Public */,
-      17,    0,   71,    2, 0x0a /* Public */,
+       1,    3,   54,    2, 0x0a /* Public */,
+       6,    2,   61,    2, 0x0a /* Public */,
+      10,    1,   66,    2, 0x0a /* Public */,
+      11,    0,   69,    2, 0x0a /* Public */,
+      12,    1,   70,    2, 0x0a /* Public */,
+      15,    1,   73,    2, 0x0a /* Public */,
+      17,    0,   76,    2, 0x0a /* Public */,
+      18,    0,   77,    2, 0x0a /* Public */,
 
  // slots: parameters
     QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int,    3,    4,    5,
@@ -89,6 +92,7 @@ static const uint qt_meta_data_DataSource[] = {
     QMetaType::Void, 0x80000000 | 13,   14,
     QMetaType::Void, QMetaType::Int,   16,
     QMetaType::Void,
+    QMetaType::Int,
 
        0        // eod
 };
@@ -107,6 +111,8 @@ void DataSource::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 4: _t->setupSerial((*reinterpret_cast< QSerialPort*(*)>(_a[1]))); break;
         case 5: _t->changeTimeScale((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 6: _t->testData(); break;
+        case 7: { int _r = _t->readData_fifo();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
@@ -166,13 +172,13 @@ int DataSource::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 7)
+        if (_id < 8)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 7;
+        _id -= 8;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 7)
+        if (_id < 8)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 7;
+        _id -= 8;
     }
     return _id;
 }

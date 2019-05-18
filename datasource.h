@@ -24,6 +24,7 @@
 #include <QtCharts/QChartGlobal>
 
 
+
 QT_BEGIN_NAMESPACE
 class QQuickView;
 //class QXYSeries;
@@ -47,6 +48,7 @@ public slots:
     void setupSerial(QSerialPort *serial);
     void changeTimeScale(int time_scale);
     void testData();
+    int readData_fifo();
 
 private:
     // Serial members
