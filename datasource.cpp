@@ -28,6 +28,7 @@
 #include <ftdi/ftd2xx.h>
 #include <unistd.h>
 #include <QElapsedTimer>
+#include <iomanip>
 //#include <sys/mman.h>
 //#include <sys/types.h>
 //#include <sys/wait.h>
@@ -301,7 +302,7 @@ void DataSource::readData(QAbstractSeries* series){
     // converts raw adc value to voltage
     qreal voltage_channel1 = VCC/2 - (raw_channel1/4095)*VCC;
     qreal voltage_channel2 = VCC/2 - (raw_channel2/4095)*VCC;
-    std::cout << "voltage channe 1: " << voltage_channel1 << " voltage channel2: " << voltage_channel2 << std::endl;
+//    std::cout << "voltage channe 1: " << voltage_channel1 << " voltage channel2: " << voltage_channel2 << std::endl;
     // adds data to their respective data structures (vectors)
     qreal t_elapsed = t.elapsed();
     QPointF point_s1(t_elapsed, voltage_channel1);
@@ -443,16 +444,16 @@ int DataSource::readData_fifo(){
                 // converts raw adc value to voltage
                 voltage_channel1 = 2 * (VCC/2 - (raw_channel1/4095)*VCC);
                 voltage_channel2 = 2 * (VCC/2 - (raw_channel2/4095)*VCC);
-                std::cout << "voltage channel1: " << voltage_channel1 << " voltage channel2: " << voltage_channel2 << std::endl;
+//                std::cout << "voltage channel1: " << voltage_channel1 << " voltage channel2: " << voltage_channel2 << std::endl;
 
-                std::cout << voltage_channel1 << std::endl;
-                std::cout << voltage_channel2 << std::endl;
+//                std::cout << voltage_channel1 << std::endl;
+//                std::cout << voltage_channel2 << std::endl;
 
                 points_total_each_channel++;
 
                 // adds data to their respective data structures (vectors)
                 qreal t_elapsed = elapsedTimer.nsecsElapsed() / 1000; // microseconds
-                std::cout << t_elapsed << std::endl;
+                std::cout << std::setprecision(10) << t_elapsed << std::endl;
                 QPointF point_s1(t_elapsed, voltage_channel1);
                 QPointF point_s2(t_elapsed, voltage_channel2);
                 if (s1.size() < MAX_DATA){

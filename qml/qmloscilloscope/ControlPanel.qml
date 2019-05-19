@@ -91,7 +91,7 @@ ColumnLayout {
 
     MultiButton {
         text: "Refresh rate(Hz): "
-        items: ["1", "24", "60"]
+        items: ["1", "24", "1000"]
         currentSelection: 2
         onSelectionChanged: refreshRateChanged(items[currentSelection]);
     }

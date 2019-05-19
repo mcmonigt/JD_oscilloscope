@@ -53,7 +53,7 @@ Item {
         onSeriesTypeChanged: scopeView.changeSeriesType(type);
         onRefreshRateChanged: {
             scopeView.changeRefreshRate(rate);
-            scopeView.changeVoltageScale(rate);
+//            scopeView.changeVoltageScale(rate);
          }
         onVoltageScaleChanged1: scopeView.changeVoltageScale1(newBoundary);
         onVoltageScaleChanged2: scopeView.changeVoltageScale2(newBoundary);
