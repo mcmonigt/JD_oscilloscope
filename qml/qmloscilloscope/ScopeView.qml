@@ -38,6 +38,7 @@ ChartView {
     property bool openGL: true
     property bool openGLSupported: true
     property int xAxisScaleValue: 1000
+
     onOpenGLChanged: {
         if (openGLSupported) {
             series("signal 1").useOpenGL = openGL;
@@ -66,8 +67,9 @@ ChartView {
 
     ValueAxis {
         id: axisX
-        min: -500
-        max: 500
+        min: -5000
+        max: 5000
+        tickCount: 9
 //        labelsVisible: false
     }
 
@@ -102,6 +104,7 @@ ChartView {
         repeat: true
         onTriggered: {
 //            console.log("timer triggered");
+            dataSource.readData_fifo();
             dataSource.update(chartView.series(0), 1);
             dataSource.update(chartView.series(1), 2);
 //            updateTimeAxis();

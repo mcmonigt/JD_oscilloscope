@@ -82,7 +82,7 @@ ColumnLayout {
         id: sampleCountButton
         text: "Time Elapsed (ms): "
 //        items: ["6", "128", "1024", "10000"]
-        items: ["10000", "1000", "100", "10"]
+        items: ["10000", "1000", "100"]
         currentSelection: 0
         // onSelectionChanged: timeAxisChanged(items[currentSelection]);
 

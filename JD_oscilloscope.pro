@@ -15,3 +15,6 @@ DISTFILES += \
 
 target.path = $$[QT_INSTALL_EXAMPLES]/charts/qmloscilloscope
 INSTALLS += target
+
+unix|win32: LIBS += -L/usr/include/local/lib -lftd2xx
+

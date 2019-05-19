@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 //    QObject::connect(&serial, &QSerialPort::readyRead, [&]
 //    {
 
-//        dataSource.readData();
+//        dataSource.readData_fifo();
 //    });
     QObject::connect(&serial,
                          static_cast<void(QSerialPort::*)(QSerialPort::SerialPortError)>

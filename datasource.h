@@ -22,6 +22,8 @@
 #include <QtCore/QPointF>
 #include <QtCore/QVector>
 #include <QtCharts/QChartGlobal>
+#include <ftdi/ftd2xx.h>
+#include <QElapsedTimer>
 
 
 QT_BEGIN_NAMESPACE
@@ -47,6 +49,8 @@ public slots:
     void setupSerial(QSerialPort *serial);
     void changeTimeScale(int time_scale);
     void testData();
+    int readData_fifo();
+    int initialize_fifo();
 
 private:
     // Serial members
@@ -54,6 +58,7 @@ private:
     QByteArray m_readData;
     QTextStream m_standardOutput;
     QTime t;
+    FT_HANDLE fthandle1;
 
     QQuickView *m_appViewer;
     QList<QVector<QPointF> > m_data1;
@@ -67,6 +72,7 @@ private:
     QVector<QPointF> s1;
     QVector<QPointF> s2;
     int timeScale;
+    QElapsedTimer elapsedTimer;
 };
 
 #endif // DATASOURCE_H

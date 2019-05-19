@@ -25,6 +25,14 @@
 #include <QIODevice>
 #include <stdio.h>
 #include <string.h>
+#include <ftdi/ftd2xx.h>
+#include <unistd.h>
+#include <QElapsedTimer>
+//#include <sys/mman.h>
+//#include <sys/types.h>
+//#include <sys/wait.h>
+
+
 #define MAX_DATA 10000
 #define VCC 3.3
 
@@ -42,18 +50,29 @@ DataSource::DataSource(QQuickView *appViewer, QSerialPort *serial, QObject *pare
     qRegisterMetaType<QAbstractSeries*>();
     qRegisterMetaType<QAbstractAxis*>();
 
-    //itializes time scale to 10000 ms
+    //itializes time scale to 10000 us
     timeScale = 10000;
 
     // starts time
     t.start();
+    elapsedTimer.start();
+
+    //maps memory for data structures to be able to be accessed by child process
+//    *s1 = mmap(NULL, sizeof *s1, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+
+
 
     // reserves memory for data structures
     s1.reserve(MAX_DATA);
     s2.reserve(MAX_DATA);
+//    s1_x.reserve(MAX_DATA);
+//    s1_y.reserve(MAX_DATA);
+//    s2_x.reserve(MAX_DATA);
+//    s2_y.reserve(MAX_DATA);
+
 
     // tests time scaling implementation
-    testData();
+//    testData();
 
     // initializes serial port
     // setupSerial(serial);
@@ -61,6 +80,8 @@ DataSource::DataSource(QQuickView *appViewer, QSerialPort *serial, QObject *pare
 
 //    generateData(0, 5, 1024);
 //    readData();
+    initialize_fifo();
+    readData_fifo();
 }
 
 
@@ -128,7 +149,9 @@ void DataSource::update(QAbstractSeries *series, int series_num)
                 qreal x_axis = s1.value(i).x() - s1.value(first_element_index).x() + minX;
 //                qDebug() << "adding element x:" << x_axis << " y:" << s1.value(i).y();
                 QPointF element(x_axis, s1.value(i).y());
+//                std::cout << "plotting point x: " << s1.value(i).x() << " y:" << s1.value(i).y() << std::endl;
                 points.append(element);
+//                printf("appending points\n");
             }
             // plots window
             xySeries->replace(points);
@@ -273,9 +296,12 @@ void DataSource::readData(QAbstractSeries* series){
     qreal raw_channel1 = ch1_0 * 1000 + ch1_1 * 100 + ch1_2 * 10 + ch1_3;
     qreal raw_channel2 = ch2_0 * 1000 + ch2_1 * 100 + ch2_2 * 10 + ch2_3;
 
+
+
     // converts raw adc value to voltage
     qreal voltage_channel1 = VCC/2 - (raw_channel1/4095)*VCC;
     qreal voltage_channel2 = VCC/2 - (raw_channel2/4095)*VCC;
+    std::cout << "voltage channe 1: " << voltage_channel1 << " voltage channel2: " << voltage_channel2 << std::endl;
     // adds data to their respective data structures (vectors)
     qreal t_elapsed = t.elapsed();
     QPointF point_s1(t_elapsed, voltage_channel1);
@@ -300,3 +326,162 @@ void DataSource::readData(QAbstractSeries* series){
 
 }
 
+int DataSource::initialize_fifo(){
+    FT_STATUS status;	//device status
+
+    //0 is index of device since we're only opening 1 device
+    status = FT_Open(0, &fthandle1);
+
+    if (status != FT_OK) {	//if device is not opened succesfully
+//        qDebug() << "open device status is not ok " << status;
+        printf("open device status is not ok %d\n", status);
+        return 0;
+    }
+
+    //set read and write timeouts as 500ms
+    status = FT_SetTimeouts(fthandle1, 500, 500);
+
+    if (status != FT_OK) {	//if timeout are not setup succesfully
+//        printf("timeout device status not Ok %d\n", status);
+        qDebug() << "timeout device status not ok " << status;
+    }
+
+    UCHAR MaskA = 0x00; // set data bus to inputs
+    UCHAR modeA = 0x40; //configure ft232h into synch fifo mode
+    //fifo mode must already have been programmed in eeprom
+    //fifo mode must already have been programmed in eeprom
+
+    //set the chip mode
+    status = FT_SetBitMode(fthandle1, MaskA, modeA);
+
+    if (status != FT_OK)//if mode seelect was not succesfull
+        printf("mode A status not ok %d\n", status);
+
+    usleep(500); // sleep for 500 microseconds
+
+    return 0;
+}
+
+int DataSource::readData_fifo(){
+
+    FT_STATUS status;
+    int count = 0;
+
+    DWORD RxBytes;	//bytes in rx  qeue
+    DWORD TxBytes;	//bytes in tx queue
+    DWORD EventDword;	//current event status state
+
+    //get the values of rx,tx queue and event status
+    status = FT_GetStatus(fthandle1, &RxBytes, &TxBytes, &EventDword);
+
+
+//    printf("bytes in RX queue %d\n", RxBytes);
+
+
+
+    char data[65536]; //buffer for incoming data
+    DWORD r_data_len = RxBytes;		//bytes to be read from device
+    DWORD data_read;		//num bytes read from device
+    memset(data, '\0', sizeof(data));
+
+
+
+
+    //read r_data_len number of bytes from device into data_in buffer
+    status = FT_Read(fthandle1, data, r_data_len, &data_read);
+
+//    std::cout << "data read: " << data_read << std::endl;
+
+
+    if (status != FT_OK) {
+        printf("status not OK %d\n", status);
+
+        printf("total bytes read %d\n", count);
+        return 0;
+    }
+    else {
+        qreal raw_channel1, raw_channel2, voltage_channel1, voltage_channel2;
+        int ch1_0, ch1_1, ch1_2, ch1_3;
+        int ch2_0, ch2_1, ch2_2, ch2_3;
+        int r1, r2, r3, sw;
+        int marker = 0;
+        unsigned int indexS;
+        for (int i = 0; i < 1000; i++){
+            if (data[i] == 's'){
+                indexS = i;
+//                std::cout << "found first s at index " << i << std::endl;
+                marker = 1;
+                break;
+            }
+        }
+        if (marker == 0){
+            std::cout << "ERROR: NO SERIAL DATA READ" << std::endl;
+            return 0;
+        }
+        int points_total_each_channel = 0;
+        unsigned int i = indexS;
+        unsigned int index_last_byte = indexS + data_read;
+        while (i < data_read - 13){ // - 13 because we must have at least one packet of data left at the end
+            if (data[i] == 's'){
+                i++;
+                ch1_0 = data[i++] - '0';
+                ch1_1 = data[i++] - '0';
+                ch1_2 = data[i++] - '0';
+                ch1_3 = data[i++] - '0';
+                ch2_0 = data[i++] - '0';
+                ch2_1 = data[i++] - '0';
+                ch2_2 = data[i++] - '0';
+                ch2_3 = data[i++] - '0';
+                r1 = data[i++] - '0';
+                r2 = data[i++] - '0';
+                r3 = data[i++] - '0';
+                sw = data[i++] - '0';
+
+                raw_channel1 = ch1_0 * 1000 + ch1_1 * 100 + ch1_2 * 10 + ch1_3;
+                raw_channel2 = ch2_0 * 1000 + ch2_1 * 100 + ch2_2 * 10 + ch2_3;
+
+                // converts raw adc value to voltage
+                voltage_channel1 = 2 * (VCC/2 - (raw_channel1/4095)*VCC);
+                voltage_channel2 = 2 * (VCC/2 - (raw_channel2/4095)*VCC);
+                std::cout << "voltage channel1: " << voltage_channel1 << " voltage channel2: " << voltage_channel2 << std::endl;
+
+                std::cout << voltage_channel1 << std::endl;
+                std::cout << voltage_channel2 << std::endl;
+
+                points_total_each_channel++;
+
+                // adds data to their respective data structures (vectors)
+                qreal t_elapsed = elapsedTimer.nsecsElapsed() / 1000; // microseconds
+                std::cout << t_elapsed << std::endl;
+                QPointF point_s1(t_elapsed, voltage_channel1);
+                QPointF point_s2(t_elapsed, voltage_channel2);
+                if (s1.size() < MAX_DATA){
+                    s1.push_back(point_s1);
+                }
+                else {
+                    s1.removeFirst();
+                    s1.push_back(point_s1);
+                }
+                if (s2.size() < MAX_DATA){
+                    s2.push_back(point_s2);
+                }
+                else {
+                    s2.removeFirst();
+                    s2.push_back(point_s2);
+                }
+
+            }
+            else {
+                i++;
+            }
+        }
+//        std::cout << "points total added: " << points_total_each_channel << std::endl;
+        // converts raw adc value to voltage
+
+
+        //close device
+//        status = FT_Close(fthandle1);
+
+        return 0;
+    }
+}
