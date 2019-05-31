@@ -44,6 +44,8 @@ ColumnLayout {
     signal antialiasingEnabled(bool enabled)
     signal openGlChanged(bool enabled)
     signal timeAxisChanged(int xAxisRange);
+    signal triggerButtonChanged(bool enabled)
+    signal triggerButtonChanged2(bool enabled)
 
     Text {
         text: "Controls"
@@ -53,7 +55,7 @@ ColumnLayout {
 
     MultiButton {
         id: signal1Button
-        text: "Signal 1: "
+        text: "Channel 1: "
         items: ["on", "off"]
         enabled: true
         currentSelection: 0
@@ -62,14 +64,32 @@ ColumnLayout {
     }
 
 
+
     MultiButton {
         id: signal2Button
-        text: "Signal 2: "
+        text: "Channel 2: "
         items: ["on", "off"]
         currentSelection: 0
         // openGlChanged needs to be changed to signal2Enabled
         onSelectionChanged: openGlChanged(currentSelection == 1);
     }
+
+    MultiButton {
+        id: triggerButton
+        text: "Trigger: "
+        items: ["on", "off"]
+        currentSelection: 0
+        onSelectionChanged: triggerButtonChanged(currentSelection == 1)
+    }
+
+//    MultiButton {
+//        id: triggerButton2
+//        text: "Trigger: "
+//        items: ["on", "off"]
+//        currentSelection: 0
+//        onSelectionChanged: triggerButtonChanged2(currentSelection == 1)
+//    }
+
 
     MultiButton {
         text: "Graph: "
@@ -81,8 +101,7 @@ ColumnLayout {
     MultiButton {
         id: sampleCountButton
         text: "Time Elapsed (ms): "
-//        items: ["6", "128", "1024", "10000"]
-        items: ["10000", "1000", "100"]
+        items: ["10000", "1000", "100", "10"]
         currentSelection: 0
         // onSelectionChanged: timeAxisChanged(items[currentSelection]);
 
@@ -91,7 +110,7 @@ ColumnLayout {
 
     MultiButton {
         text: "Refresh rate(Hz): "
-        items: ["1", "24", "1000"]
+        items: ["1", "24", "60"]
         currentSelection: 2
         onSelectionChanged: refreshRateChanged(items[currentSelection]);
     }
@@ -99,7 +118,7 @@ ColumnLayout {
     MultiButton {
         id: voltageScaleButton1
         text: "Voltage Signal 1: "
-        items: ["5", "10", "1"]
+        items: ["5", "4", "3", "2", "1"]
         currentSelection: 0
         onSelectionChanged: voltageScaleChanged1(
                                 voltageScaleButton1.items[voltageScaleButton1.currentSelection],
@@ -110,12 +129,13 @@ ColumnLayout {
     MultiButton {
         id: voltageScaleButton2
         text: "Voltage Signal 2: "
-        items: ["5", "10", "1"]
+        items: ["5", "4", "3", "2", "1"]
         currentSelection: 0
         onSelectionChanged: voltageScaleChanged2(
                                 voltageScaleButton2.items[voltageScaleButton2.currentSelection],
                                 5,
                                 selection);
     }
+
 
 }

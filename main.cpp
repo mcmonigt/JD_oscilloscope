@@ -10,7 +10,9 @@
  ********************************************/
 
 
-
+#include <QQmlContext>
+#include <QQmlApplicationEngine>
+#include <QQuickWindow>
 #include <QtWidgets/QApplication>
 #include <QtQml/QQmlContext>
 #include <QtQuick/QQuickView>
@@ -22,6 +24,10 @@
 #include <QDebug>
 #include <QSerialPort>
 #include <QSerialPortInfo>
+#include <QVector>
+#include <QPointF>
+#include <iostream>
+#include <unistd.h>
 #include "datasource.h"
 
 int main(int argc, char *argv[])
@@ -52,6 +58,7 @@ int main(int argc, char *argv[])
     // Basically, it allows the program to end when the window is closed.
     QObject::connect(viewer.engine(), &QQmlEngine::quit, &viewer, &QWindow::close);
 
+
     // Sets the tittle for the graph
     viewer.setTitle(QStringLiteral("JD Oscilloscope"));
 
@@ -61,15 +68,41 @@ int main(int argc, char *argv[])
     // Creates an object of class DataSource which is created and defined in datasource.h and datasource.cpp
     // the object viewer of class QQuickView is passed as an argument to the constructor of DataSource which
     // links it to the QQuickView private member of the DataSource class for later use
-    DataSource dataSource(&viewer, &serial);
+    DataSource* dataSource = new DataSource(&viewer, &serial);
+//    QThread* thread = new QThread;
+//    dataSource->moveToThread(thread);
+//    QObject::connect(thread, SIGNAL (started()), dataSource, SLOT (readData_fifo()));
+
+     // allows type QVector<QPointF> to be passed on to slots in a signal
+     qRegisterMetaType<QVector<QPointF> >();
+     // allows type qreal to be passed on to slots in a signal
+     qRegisterMetaType<qreal>();
+
+//     QQmlEngine engine;
+//     QQmlComponent component (&engine, "/home/mcmonigt/Applications/qt_applications/JD_oscilloscope/qml/qmloscilloscope/main.qml");
+//     QObject *object = component.create();
+//     QVariant returnedValue;
+//     QVariant msg = "Hello from C++";
+//     QMetaObject::invokeMethod(object, "myQmlFunction",
+//         Q_RETURN_ARG(QVariant, returnedValue),
+//         Q_ARG(QVariant, msg));
+
+//     qDebug() << "QML function returned:" << returnedValue.toString();
+//     delete object;
+
+
+
 
     // The following line accesses the QQmlContext class member, contexts allow data to be exposed to the QML components instantiated by the QML engine.
     // Each QQmlContext contains a set of properties, distinct from its QObject properties, that allow data to be explicitly bound to a context by name.
     // The context properties are defined and updated by calling QQmlContext::setContextProperty().
-    viewer.rootContext()->setContextProperty("dataSource", &dataSource);
+    viewer.rootContext()->setContextProperty("dataSource", dataSource);
 
     // Sets the source to the url, loads the QML component and instantiates it
     viewer.setSource(QUrl("qrc:/qml/qmloscilloscope/main.qml"));
+
+    //get root object from view
+//    QObject *object = viewer.rootObject();
 
     // Sets the root item to automatically resize the view to the size of the view.
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
@@ -79,6 +112,12 @@ int main(int argc, char *argv[])
 
     // Allows the window to be displayed
     viewer.show();
+
+
+//    QQmlEngine engine;
+//    QQmlComponent component (&engine, "qrc:/qml/qmloscilloscope/main.qml");
+//    QObject *object = component.create();
+//    QObject::connect(object, SIGNAL(callTimeScaleChange(int)), dataSource, SLOT(changeTimeScale(int)));
 
 //    QObject::connect(&serial, &QSerialPort::readyRead, [&]
 //    {
@@ -94,6 +133,25 @@ int main(int argc, char *argv[])
         qDebug() << "An error occured: " << error;
         return qApp->quit();
     });
+
+//    QObject::connect(dataSource, SIGNAL (signal_modifyTimeScale(QVariant)), viewer.engineQObject)
+
+    // Connecting C++ to QML signals
+//    QQmlApplicationEngine engine;
+//    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+//    QObject *topLevel = engine.rootObjects().value(0);
+//    QQuickItem *item = qobject_cast<QQuickItem*>(topLevel);
+//    QObject::connect(dataSource, SIGNAL(signal_modifyTimeScale(QVariant)), item, SLOT(modifyTimeScale(QVariant)));
+
+//    QQuickView view(QUrl(QStringLiteral("/home/mcmonigt/Applications/qt_applications/JD_oscilloscope/qml/qmloscilloscope/main.qml")));
+//    QObject *item = view.rootObject();
+//    QObject::connect(dataSource, SIGNAL(signal_modifyTimeScale(QVariant)), item, SLOT(modifyTimeScale(QVariant)));
+//    qmlRegisterType<DataSource>("datasoureregiste", 1, 0, "DataSource");
+//    QQmlApplicationEngine engine;
+//    engine.load(QUrl(QStringLiteral("/home/mcmonigt/Applications/qt_applications/JD_oscilloscope/qml/qmloscilloscope/main.qml")));
+//    if (engine.rootObjects().isEmpty()){
+//        std::cout << "failed to open engine" << std::endl;
+//    }
 
     // Executes the app
     return app.exec();

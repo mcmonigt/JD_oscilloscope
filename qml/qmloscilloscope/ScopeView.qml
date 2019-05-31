@@ -32,6 +32,8 @@ import QtCharts 2.1
 
 //![1]
 ChartView {
+    signal signalTimeScaleChanged2(int sampleCount)
+
     id: chartView
     animationOptions: ChartView.NoAnimation
     theme: ChartView.ChartThemeDark
@@ -41,36 +43,51 @@ ChartView {
 
     onOpenGLChanged: {
         if (openGLSupported) {
-            series("signal 1").useOpenGL = openGL;
-            series("signal 2").useOpenGL = openGL;
+            series("Channel 1").useOpenGL = openGL;
+            series("Channel 2").useOpenGL = openGL;
         }
     }
     Component.onCompleted: {
-        if (!series("signal 1").useOpenGL) {
+        if (!series("Channel 1").useOpenGL) {
             openGLSupported = false
             openGL = false
         }
+//        if (!series("Channel 2").useOpenGl){
+//            openGLSupported = false
+//            openGL = false
+//        }
     }
 
     ValueAxis {
         id: axisY1
-        min: -1
-        max: 4
-
+        min: -5
+        max: 5
+        tickCount: 11
+        titleText: "Voltage Channel 1"
     }
 
     ValueAxis {
         id: axisY2
-        min: -10
+        min: -5
         max: 5
+        tickCount: 11
+        titleText: "Voltage Channel 2"
     }
 
     ValueAxis {
         id: axisX
         min: -5000
         max: 5000
-        tickCount: 9
+        tickCount: 11
+        titleText: "Time Channel 1 (us)"
 //        labelsVisible: false
+    }
+    ValueAxis {
+        id: axisX2
+        min: -5000
+        max: 5000
+        tickCount: 11
+        titleText: "Time Channel 2 (us)"
     }
 
 //    ValueAxis {
@@ -82,18 +99,33 @@ ChartView {
 
     LineSeries {
         id: lineSeries1
-        name: "signal 1"
+        name: "Channel 1"
         axisX: axisX
         axisY: axisY1
         useOpenGL: chartView.openGL
     }
     LineSeries {
         id: lineSeries2
-        name: "signal 2"
-        axisX: axisX
+        name: "Channel 2"
+        axisXTop: axisX2
         axisYRight: axisY2
         useOpenGL: chartView.openGL
     }
+    LineSeries {
+        id: trigger
+        name: "Trigger"
+        axisX: axisX
+        axisY: axisY1
+        useOpenGL: chartView.openGL
+    }
+//    LineSeries {
+//        id: trigger2
+//        name: "Trigger Channel 2"
+//        axisXTop: axisX2
+//        axisYRight: axisY2
+//        useOpenGL: chartView.openGL
+//    }
+
 //![1]
 
     //![2]
@@ -104,12 +136,24 @@ ChartView {
         repeat: true
         onTriggered: {
 //            console.log("timer triggered");
-            dataSource.readData_fifo();
+//            dataSource.readData_fifo();
+//            dataSource.read_data();
             dataSource.update(chartView.series(0), 1);
             dataSource.update(chartView.series(1), 2);
+            dataSource.update(chartView.series(2), 4);
+//            dataSource.update(chartView.series(3), 4);
 //            updateTimeAxis();
         }
     }
+//    Timer {
+//        id : readDataTimer
+//        interval: 0
+//        running: false
+//        repeat: true
+//        onTriggered: {
+//            dataSource.read_data();
+//        }
+//    }
     //![2]
 
     //![3]
@@ -120,22 +164,24 @@ ChartView {
         // but the series have their own y-axes to make it possible to control the y-offset
         // of the "signal sources".
         if (type == "line") {
-            var series1 = chartView.createSeries(ChartView.SeriesTypeLine, "signal 1",
+            var series1 = chartView.createSeries(ChartView.SeriesTypeLine, "Channel 1",
                                                  axisX, axisY1);
             series1.useOpenGL = chartView.openGL
 
-            var series2 = chartView.createSeries(ChartView.SeriesTypeLine, "signal 2",
-                                                 axisX, axisY2);
+            var series2 = chartView.createSeries(ChartView.SeriesTypeLine, "Channel 2",
+                                                 axisX2, axisY2);
             series2.useOpenGL = chartView.openGL
+
+
         } else {
-            var series1 = chartView.createSeries(ChartView.SeriesTypeScatter, "signal 1",
+            var series1 = chartView.createSeries(ChartView.SeriesTypeScatter, "Channel 1",
                                                  axisX, axisY1);
             series1.markerSize = 2;
             series1.borderColor = "transparent";
             series1.useOpenGL = chartView.openGL
 
-            var series2 = chartView.createSeries(ChartView.SeriesTypeScatter, "signal 2",
-                                                 axisX, axisY2);
+            var series2 = chartView.createSeries(ChartView.SeriesTypeScatter, "Channel 2",
+                                                 axisX2, axisY2);
             series2.markerSize = 2;
             series2.borderColor = "transparent";
             series2.useOpenGL = chartView.openGL
@@ -157,11 +203,10 @@ ChartView {
     }
 
     function changeRefreshRate(rate) {
-//        axisY1.min = -10;
-//        axisY1.min = 10;
         refreshTimer.interval = 1 / Number(rate) * 1000;
     }
     function changeVoltageScale1(newBoundary) {
+//        console.log("changing voltage scale 1");
         axisY1.min = -newBoundary;
         axisY1.max = newBoundary;
     }
@@ -169,19 +214,37 @@ ChartView {
         axisY2.min = -newBoundary;
         axisY2.max = newBoundary;
     }
+    function changeAxisX2(value){
+        axisX2.max = value;
+        axisX2.min = -value;
+    }
 
     function signal1Visible(enabled){
         if (enabled)
-            series("signal 1").visible = false;
+            series("Channel 1").visible = false;
         else
-            series("signal 1").visible = true;
+            series("Channel 1").visible = true;
+    }
+
+    function triggerVisible(enabled){
+        if (enabled)
+            series("Trigger").visible = false;
+        else
+            series("Trigger").visible = true;
+    }
+
+    function triggerVisible2(enabled){
+        if (enabled)
+            series("Trigger Channel 2").visible = false;
+        else
+            series("Trigger Channel 2").visible = true;
     }
 
     function signal2Visible(enabled){
         if (enabled)
-            series("signal 2").visible = false;
+            series("Channel 2").visible = false;
         else
-            series("signal 2").visible = true;
+            series("Channel 2").visible = true;
    }
     function xAxisChanged(xAxisRange){
 
@@ -192,4 +255,5 @@ ChartView {
         axisX.max = dataSource.timeElapsed();
 //        axisX.min = dataSource.timeElapsed() - dummy.max;
     }
+
 }

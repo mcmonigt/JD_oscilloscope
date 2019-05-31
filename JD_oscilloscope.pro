@@ -1,11 +1,13 @@
 QT += charts qml quick serialport core
 
 HEADERS += \
-    datasource.h
+    datasource.h \
+    readfifo.h
 
 SOURCES += \
     main.cpp \
-    datasource.cpp
+    datasource.cpp \
+    readfifo.cpp
 
 RESOURCES += \
     resources.qrc
