@@ -1,31 +1,13 @@
-/****************************************************************************
-**
-** Copyright (C) 2016 The Qt Company Ltd.
-** Contact: https://www.qt.io/licensing/
-**
-** This file is part of the Qt Charts module of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:GPL$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see https://www.qt.io/terms-conditions. For further
-** information use the contact form at https://www.qt.io/contact-us.
-**
-** GNU General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU
-** General Public License version 3 or (at your option) any later version
-** approved by the KDE Free Qt Foundation. The licenses are as published by
-** the Free Software Foundation and appearing in the file LICENSE.GPL3
-** included in the packaging of this file. Please review the following
-** information to ensure the GNU General Public License requirements will
-** be met: https://www.gnu.org/licenses/gpl-3.0.html.
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
+/********************************************
+ * Project: JD_oscilloscope
+ * File Name: datasource.h
+ * Modified  and Adapted by Tomas McMonigal
+ * Original files provided by The Qt Company Ltd. under the terms
+ * of the GNU Free Documentation License Version 1.3 published by the
+ * Free Software Foundation.
+ * Date Modified: 5/31/19
+ * Description: qml file that controls the functionality of the elements of the graph.
+ ********************************************/
 
 import QtQuick 2.0
 import QtCharts 2.1
@@ -90,13 +72,6 @@ ChartView {
         titleText: "Time Channel 2 (us)"
     }
 
-//    ValueAxis {
-//        id: timeScale
-//        min: 0
-//        max: 10000
-//        labelsVisible: true
-//    }
-
     LineSeries {
         id: lineSeries1
         name: "Channel 1"
@@ -145,15 +120,7 @@ ChartView {
 //            updateTimeAxis();
         }
     }
-//    Timer {
-//        id : readDataTimer
-//        interval: 0
-//        running: false
-//        repeat: true
-//        onTriggered: {
-//            dataSource.read_data();
-//        }
-//    }
+
     //![2]
 
     //![3]
@@ -172,19 +139,27 @@ ChartView {
                                                  axisX2, axisY2);
             series2.useOpenGL = chartView.openGL
 
+            var series3 = chartView.createSeries(chartView.SeriesTypeLine, "Trigger",
+                                                axisX, axisY1);
+            series3.useOpenGL = charView.openGl
+
 
         } else {
             var series1 = chartView.createSeries(ChartView.SeriesTypeScatter, "Channel 1",
                                                  axisX, axisY1);
-            series1.markerSize = 2;
+            series1.markerSize = 3;
             series1.borderColor = "transparent";
             series1.useOpenGL = chartView.openGL
 
             var series2 = chartView.createSeries(ChartView.SeriesTypeScatter, "Channel 2",
                                                  axisX2, axisY2);
-            series2.markerSize = 2;
+            series2.markerSize = 3;
             series2.borderColor = "transparent";
             series2.useOpenGL = chartView.openGL
+
+            var series3 = chartView.createSeries(chartView.SeriesTypeLine, "Trigger",
+                                                axisX, axisY1);
+            series3.useOpenGL = charView.openGl
         }
     }
 
@@ -246,14 +221,5 @@ ChartView {
         else
             series("Channel 2").visible = true;
    }
-    function xAxisChanged(xAxisRange){
-
-        dummy.max = xAxisRange;
-
-    }
-    function updateTimeAxis(){
-        axisX.max = dataSource.timeElapsed();
-//        axisX.min = dataSource.timeElapsed() - dummy.max;
-    }
 
 }

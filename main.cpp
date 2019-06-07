@@ -5,8 +5,9 @@
  * Original files provided by The Qt Company Ltd. under the terms
  * of the GNU Free Documentation License Version 1.3 published by the
  * Free Software Foundation.
- * Date Modified: 4/14/19
- * Description: hi
+ * Date Modified: 5/31/19
+ * Description: Main function which creates objects and connections between c++,
+ * and qml files and executes the application.
  ********************************************/
 
 
@@ -60,15 +61,13 @@ int main(int argc, char *argv[])
 
 
     // Sets the tittle for the graph
-    viewer.setTitle(QStringLiteral("JD Oscilloscope"));
+    viewer.setTitle(QStringLiteral("USB Oscilloscope"));
 
-    // Creates the object for serial communications
-    QSerialPort serial;
 
     // Creates an object of class DataSource which is created and defined in datasource.h and datasource.cpp
     // the object viewer of class QQuickView is passed as an argument to the constructor of DataSource which
     // links it to the QQuickView private member of the DataSource class for later use
-    DataSource* dataSource = new DataSource(&viewer, &serial);
+    DataSource* dataSource = new DataSource(&viewer);
 //    QThread* thread = new QThread;
 //    dataSource->moveToThread(thread);
 //    QObject::connect(thread, SIGNAL (started()), dataSource, SLOT (readData_fifo()));
@@ -77,19 +76,6 @@ int main(int argc, char *argv[])
      qRegisterMetaType<QVector<QPointF> >();
      // allows type qreal to be passed on to slots in a signal
      qRegisterMetaType<qreal>();
-
-//     QQmlEngine engine;
-//     QQmlComponent component (&engine, "/home/mcmonigt/Applications/qt_applications/JD_oscilloscope/qml/qmloscilloscope/main.qml");
-//     QObject *object = component.create();
-//     QVariant returnedValue;
-//     QVariant msg = "Hello from C++";
-//     QMetaObject::invokeMethod(object, "myQmlFunction",
-//         Q_RETURN_ARG(QVariant, returnedValue),
-//         Q_ARG(QVariant, msg));
-
-//     qDebug() << "QML function returned:" << returnedValue.toString();
-//     delete object;
-
 
 
 
@@ -113,45 +99,6 @@ int main(int argc, char *argv[])
     // Allows the window to be displayed
     viewer.show();
 
-
-//    QQmlEngine engine;
-//    QQmlComponent component (&engine, "qrc:/qml/qmloscilloscope/main.qml");
-//    QObject *object = component.create();
-//    QObject::connect(object, SIGNAL(callTimeScaleChange(int)), dataSource, SLOT(changeTimeScale(int)));
-
-//    QObject::connect(&serial, &QSerialPort::readyRead, [&]
-//    {
-
-//        dataSource.readData_fifo();
-//    });
-    QObject::connect(&serial,
-                         static_cast<void(QSerialPort::*)(QSerialPort::SerialPortError)>
-                         (&QSerialPort::error),
-                         [&](QSerialPort::SerialPortError error)
-    {
-        //this is called when a serial communication error occurs
-        qDebug() << "An error occured: " << error;
-        return qApp->quit();
-    });
-
-//    QObject::connect(dataSource, SIGNAL (signal_modifyTimeScale(QVariant)), viewer.engineQObject)
-
-    // Connecting C++ to QML signals
-//    QQmlApplicationEngine engine;
-//    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-//    QObject *topLevel = engine.rootObjects().value(0);
-//    QQuickItem *item = qobject_cast<QQuickItem*>(topLevel);
-//    QObject::connect(dataSource, SIGNAL(signal_modifyTimeScale(QVariant)), item, SLOT(modifyTimeScale(QVariant)));
-
-//    QQuickView view(QUrl(QStringLiteral("/home/mcmonigt/Applications/qt_applications/JD_oscilloscope/qml/qmloscilloscope/main.qml")));
-//    QObject *item = view.rootObject();
-//    QObject::connect(dataSource, SIGNAL(signal_modifyTimeScale(QVariant)), item, SLOT(modifyTimeScale(QVariant)));
-//    qmlRegisterType<DataSource>("datasoureregiste", 1, 0, "DataSource");
-//    QQmlApplicationEngine engine;
-//    engine.load(QUrl(QStringLiteral("/home/mcmonigt/Applications/qt_applications/JD_oscilloscope/qml/qmloscilloscope/main.qml")));
-//    if (engine.rootObjects().isEmpty()){
-//        std::cout << "failed to open engine" << std::endl;
-//    }
 
     // Executes the app
     return app.exec();

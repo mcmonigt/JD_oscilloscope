@@ -22,7 +22,7 @@
 #include <QQmlComponent>
 #include <QMetaObject>
 #define MAX_DATA 10000
-#define VCC 3.3
+
 #define BUFFER_SIZE 130000
 #define BUFF_SIZE 130000
 #define MAX_PACKETS 10000

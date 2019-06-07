@@ -5,8 +5,8 @@
  * Original files provided by The Qt Company Ltd. under the terms
  * of the GNU Free Documentation License Version 1.3 published by the
  * Free Software Foundation.
- * Date Modified: 4/14/19
- * Description:
+ * Date Modified: 5/31/19
+ * Description: Class definition file for DataSource
  ********************************************/
 
 #ifndef DATASOURCE_H
@@ -34,7 +34,6 @@
 
 QT_BEGIN_NAMESPACE
 class QQuickView;
-//class QXYSeries;
 QT_END_NAMESPACE
 
 QT_CHARTS_USE_NAMESPACE
@@ -42,37 +41,26 @@ QT_CHARTS_USE_NAMESPACE
 class DataSource : public QObject
 {
     Q_OBJECT
-//    Q_PROPERTY(int status_rotary3 READ status_rotary3 WRITE setStatus_rotary3 NOTIFY status_rotary3Changed)
     QThread workerThread;
 public:
-    explicit DataSource(QQuickView *appViewer,QSerialPort *serial, QObject *parent = 0);
+    explicit DataSource(QQuickView *appViewer, QObject *parent = 0);
 
 Q_SIGNALS:
 
 public slots:
     void update(QAbstractSeries *series, int series_num);
-    int timeElapsed();
     void changeTimeScale(int time_scale);
     void testData();
     int readData_fifo();
     int initialize_fifo();
-    int read_data();
-    void set_channel_switch(QVariant sw);
-    void modifyVoltageScale(QVariant value);
-    void changeTrigger1(QVariant value);
-    void modifyTimeScale(QVariant value);
-    void update_data(QVector<QPointF> vector1, QVector<QPointF> vector2);
-//    void triggerChannel1Changed(qreal value);
-//    void triggetChannel2Changed(qreal value);
-    void checkTrigger();
+    void modifyVoltageScale(int value);
+    void modifyTimeScale(int value);
+    void changeTrigger(int value);
     void updateTrigger(int index);
-
-//public:
-//    int status_rotary3() const;
-//    void setStatus_rotary3(int value);
+    void set_channel_switch(int sw);
+    void triggerOnOff();
 
 signals:
-    void operate();
     void signal_modifyTimeScale(QVariant value);
     void signalTimeScale1_10000();
     void signalTimeScale1_1000();
@@ -96,15 +84,8 @@ signals:
     void signalDecreaseTrigger1();
     void signalChannelChanged1();
     void signalChannelChanged2();
-//    void status_rotary3Changed();
 private:
-    QMutex m_Mutex;
     int m_status_rotary3;
-    // Serial members
-    QSerialPort *m_serialPort = nullptr;
-    QByteArray m_readData;
-    QTextStream m_standardOutput;
-    QTime t;
     FT_HANDLE fthandle1;
 //    QObject *object;
 
@@ -127,20 +108,24 @@ private:
     QVector<int> voltageRotary;
     QVector<int> timeRotary;
     int channel_switch;
-    QQuickItem *chartView;
     int voltageScale1;
     int voltageScale2;
     qreal trigger1;
     qreal trigger2;
-//    qreal triggerValue1;
-//    qreal triggerValue2;
     int trigger1Set;
     int trigger2Set;
-    qreal maxValueChannel1;
     qreal lastYValue1;
     qreal lastYValue2;
-//    qreal maxValueChannel2;
-    int mutex;
+    int triggerON;
+
+
+
+    // readfifo.h variables that are not repeated
+    qreal timeScale;
+    QVector<int> rotary1;
+    QVector<int> rotary2;
+    QVector<int> rotary3;
+
 };
 
 #endif // DATASOURCE_H
